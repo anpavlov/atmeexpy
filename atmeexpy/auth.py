@@ -1,7 +1,7 @@
 import httpx
 import typing
 
-from .const import ATMEEX_API_BASE_URL
+from .const import ATMEEX_API_BASE_URL, COMMON_HEADERS
 
 
 class AtmeexAuth(httpx.Auth):
@@ -22,6 +22,7 @@ class AtmeexAuth(httpx.Auth):
 
         if response.status_code == 401:
             yield from self.refresh_token()
+            request.headers["authorization"] = f"Bearer {self._access_token}"
             yield request
 
     def refresh_token(self) -> typing.Generator[httpx.Request, httpx.Response, None]:
@@ -33,8 +34,11 @@ class AtmeexAuth(httpx.Auth):
             "grant_type": "refresh_token",
             "refresh_token": self._refresh_token,
         }
-        response = yield httpx.Request("POST", ATMEEX_API_BASE_URL + "/auth/signin", json=payload, headers={"accept": "application/json", "user-agent": "okhttp/3.14.9"})
-        self.handle_auth_response(response)
+        response = yield httpx.Request("POST", ATMEEX_API_BASE_URL + "/auth/signin", json=payload, headers=COMMON_HEADERS)
+        if response.status_code == 401:
+            yield from self.auth_with_email()
+        else:
+            self.handle_auth_response(response)
 
     def auth_with_email(self) -> typing.Generator[httpx.Request, httpx.Response, None]:
         payload = {
@@ -42,7 +46,7 @@ class AtmeexAuth(httpx.Auth):
             "password": self.password,
             "grant_type": "basic",
         }
-        response = yield httpx.Request("POST", ATMEEX_API_BASE_URL + "/auth/signin", json=payload, headers={"accept": "application/json", "user-agent": "okhttp/3.14.9"})
+        response = yield httpx.Request("POST", ATMEEX_API_BASE_URL + "/auth/signin", json=payload, headers=COMMON_HEADERS)
         self.handle_auth_response(response)
 
     def handle_auth_response(self, response: httpx.Response):

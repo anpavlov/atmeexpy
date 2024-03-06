@@ -4,6 +4,8 @@ from dacite import from_dict
 
 from .models import DeviceModel, DeviceSettingsSetModel
 
+HEATER_DISABLE_TEMP = -1000
+
 class Device:
     model: DeviceModel
     _http_client: httpx.AsyncClient
@@ -17,14 +19,14 @@ class Device:
         resp.raise_for_status()
         device_info = resp.json()
         try:
-            model = from_dict(data_class=DeviceModel, data = device_info)
+            self.model = from_dict(data_class=DeviceModel, data = device_info)
         except Exception:
             print(traceback.format_exc())
             print(device_info)
 
     async def set_heat_temp(self, temp: int):
-        if temp < 100 or temp > 300:
-            raise ValueError(f"set_heat_temp temp not between 100 and 300: {temp}")
+        if temp < 100 or temp > 300 or temp != HEATER_DISABLE_TEMP:
+            raise ValueError(f"set_heat_temp temp not between 100 and 300 and not -1000: {temp}")
 
         if temp % 10 not in [0, 5]:
             raise ValueError(f"set_heat_temp temp ends not with 0 or 5: {temp}")

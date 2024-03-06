@@ -25,7 +25,7 @@ class Device:
             print(device_info)
 
     async def set_heat_temp(self, temp: int):
-        if temp < 100 or temp > 300 or temp != HEATER_DISABLE_TEMP:
+        if (temp < 100 or temp > 300) and temp != HEATER_DISABLE_TEMP:
             raise ValueError(f"set_heat_temp temp not between 100 and 300 and not -1000: {temp}")
 
         if temp % 10 not in [0, 5]:

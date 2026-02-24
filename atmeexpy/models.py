@@ -35,7 +35,7 @@ class DeviceSettingsModel(Model):
     u_cool_mode: bool
     u_night_start: str
     u_night_stop: str
-    u_time_zone: Optional[str]
+    u_time_zone: Optional[int]
 
     @staticmethod
     def fromdict(data):

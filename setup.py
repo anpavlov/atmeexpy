@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='atmeexpy',
-    version='0.1.2',
+    version='0.1.3',
     url='https://github.com/anpavlov/atmeexpy',
     author='Andrey Pavlov',
     author_email='dir94@mail.ru',

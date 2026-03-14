@@ -39,8 +39,16 @@ class Device:
 
         await self._set_params(DeviceSettingsSetModel(u_fan_speed=fan_speed))
 
-    async def set_power(self, power: bool):
-        if power:
-            await self._set_params(DeviceSettingsSetModel(u_damp_pos=0, u_pwr_on=True))
-        else:
-            await self._set_params(DeviceSettingsSetModel(u_damp_pos=2, u_pwr_on=False))
+    async def set_power_and_damp(self, power: bool, damp_pos: int):
+        await self._set_params(DeviceSettingsSetModel(u_damp_pos=damp_pos, u_pwr_on=power))
+
+    async def set_power_only(self, power: bool):
+        """Set power without changing damper position."""
+        await self._set_params(DeviceSettingsSetModel(u_pwr_on=power))
+
+    async def set_damp_pos(self, damp_pos: int):
+        """Set damper position: 0=open, 1=mixed, 2=closed"""
+        if damp_pos not in [0, 1, 2]:
+            raise ValueError(f"set_damp_pos damp_pos must be 0, 1 or 2: {damp_pos}")
+
+        await self._set_params(DeviceSettingsSetModel(u_damp_pos=damp_pos))

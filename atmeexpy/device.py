@@ -9,7 +9,7 @@ HEATER_DISABLE_TEMP = -1000
 class Device:
     model: DeviceModel
     _http_client: httpx.AsyncClient
-    
+
     def __init__(self, http_client: httpx.Client, data: dict):
         self._http_client = http_client
         self.model = from_dict(data_class=DeviceModel, data=data)

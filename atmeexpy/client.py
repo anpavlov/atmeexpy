@@ -6,9 +6,15 @@ from .device import Device
 
 class AtmeexClient:
 
-    def __init__(self, email: str, password: str) -> None:
+    def __init__(self, email: str, password: str, http_client: httpx.AsyncClient | None = None) -> None:
         self.auth = AtmeexAuth(email, password)
-        self.http_client = httpx.AsyncClient(auth=self.auth, headers=COMMON_HEADERS, base_url=ATMEEX_API_BASE_URL)
+        if http_client is not None:
+            self.http_client = http_client
+            self.http_client.auth = self.auth
+            self.http_client.headers.update(COMMON_HEADERS)
+            self.http_client.base_url = ATMEEX_API_BASE_URL
+        else:
+            self.http_client = httpx.AsyncClient(auth=self.auth, headers=COMMON_HEADERS, base_url=ATMEEX_API_BASE_URL)
 
     def restore_tokens(self, access_token: str, refresh_token: str):
         self.auth._access_token = access_token
